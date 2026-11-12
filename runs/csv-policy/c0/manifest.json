@@ -1,0 +1,16 @@
+{
+  "run_id": "csv-c0",
+  "mode": "takeover",
+  "condition": "c0",
+  "workspace": "D:\\Projects\\handoff-verify\\runs\\takeover-csv\\c0",
+  "repo": "D:\\Projects\\handoff-verify\\runs\\takeover-csv\\c0\\repo",
+  "model": {
+    "profile": "profile1",
+    "model": "Qwen/Qwen3.8-Flash-Next",
+    "base_url": "https://api-inference.modelscope.cn/v1"
+  },
+  "status": "running",
+  "started_at": "2026-11-12T13:31:26.928647+00:00",
+  "max_steps": 12,
+  "max_seconds": 300.0
+}

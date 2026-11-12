@@ -1,0 +1,13 @@
+{
+  "condition": "c1",
+  "run_id": "c1",
+  "status": "max_steps (task solved)",
+  "tokens": 101535,
+  "steps": 12,
+  "duration_s": 107.4,
+  "hidden_tests_passed": true,
+  "stdlib_ok": true,
+  "final_answer": false,
+  "material": "D:\\Projects\\handoff-verify\\runs\\csv-policy\\takeover\\c1\\raw\\transcript.md",
+  "material_chars": 6827
+}

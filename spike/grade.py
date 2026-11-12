@@ -11,10 +11,10 @@ import sys
 from pathlib import Path
 
 SPIKE_DIR = Path(__file__).resolve().parent
-HIDDEN = SPIKE_DIR / "task" / "hidden"
+DEFAULT_HIDDEN = SPIKE_DIR / "tasks" / "pagination-csv" / "hidden"
 
 
-def stdlib_check(repo: Path) -> dict:
+def stdlib_check(repo: Path, required: set[str]) -> dict:
     app = repo / "app.py"
     try:
         tree = ast.parse(app.read_text(encoding="utf-8"))
@@ -34,17 +34,17 @@ def stdlib_check(repo: Path) -> dict:
                 bad.append(node.module)
     funcs = {n.name for n in tree.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
     return {
-        "ok": not bad and {"parse_pagination", "export_csv"} <= funcs,
+        "ok": not bad and required <= funcs,
         "bad_imports": bad,
-        "has_functions": sorted({"parse_pagination", "export_csv"} & funcs),
+        "has_functions": sorted(required & funcs),
     }
 
 
-def run(repo: Path) -> dict:
+def run(repo: Path, hidden: Path, required: set[str]) -> dict:
     env = os.environ.copy()
-    env["PYTHONPATH"] = str(repo) + os.pathsep + str(HIDDEN) + os.pathsep + env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = str(repo) + os.pathsep + str(hidden) + os.pathsep + env.get("PYTHONPATH", "")
     proc = subprocess.run(
-        [sys.executable, "-m", "unittest", "discover", "-s", str(HIDDEN), "-p", "test_*.py", "-v"],
+        [sys.executable, "-m", "unittest", "discover", "-s", str(hidden), "-p", "test_*.py", "-v"],
         cwd=str(repo),
         capture_output=True,
         text=True,
@@ -58,16 +58,20 @@ def run(repo: Path) -> dict:
         "returncode": proc.returncode,
         "stdout": proc.stdout[-8000:],
         "stderr": proc.stderr[-4000:],
-        "stdlib": stdlib_check(repo),
+        "stdlib": stdlib_check(repo, required),
     }
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo", required=True)
+    parser.add_argument("--hidden", default=str(DEFAULT_HIDDEN))
+    parser.add_argument("--functions", default="parse_pagination,export_csv",
+                        help="comma-separated public functions that must exist")
     parser.add_argument("--out")
     args = parser.parse_args()
-    result = run(Path(args.repo).resolve())
+    required = {x.strip() for x in args.functions.split(",") if x.strip()}
+    result = run(Path(args.repo).resolve(), Path(args.hidden).resolve(), required)
     text = json.dumps(result, ensure_ascii=False, indent=2)
     if args.out:
         Path(args.out).write_text(text, encoding="utf-8")

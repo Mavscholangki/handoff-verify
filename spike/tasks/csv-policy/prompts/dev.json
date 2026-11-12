@@ -1,0 +1,6 @@
+[
+  {
+    "name": "happy_path_only",
+    "text": "Read TASK.md and implement export_csv in app.py. Work only on the happy path: header from the first row's keys in order, ordinary values converted with str(), LF line endings via csv.writer(lineterminator='\\n'), and csv-module quoting. The deferred product policy is: booleans serialize lowercase true/false; None and missing keys become empty fields; extra keys in later rows are ignored; a row whose values are all empty is skipped; an empty list returns the empty string. Do NOT implement these deferred edge cases in this phase; they belong to the next person. Run the visible tests when done. In your final summary, list these deferred product decisions exactly so the next person can finish them."
+  }
+]

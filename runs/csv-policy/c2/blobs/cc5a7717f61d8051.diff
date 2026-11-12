@@ -1,0 +1,88 @@
+diff --git a/_policy_check.py b/_policy_check.py
+new file mode 100644
+index 0000000..23bc86b
+--- /dev/null
++++ b/_policy_check.py
+@@ -0,0 +1,15 @@
++"""Scratch verification of the recorded CSV policy (not part of the task)."""
++from app import export_csv as e
++
++cases = {
++    "empty": e([]),
++    "bools": e([{"flag": True, "off": False, "n": 1}]),
++    "none_missing": e([{"a": None, "b": 1}, {"b": 2}]),
++    "extra_keys": e([{"a": 1}, {"a": 2, "zzz": 9}]),
++    "all_empty_row_skipped": e([{"a": 1, "b": 2}, {"a": None, "b": ""}, {"a": 3, "b": 4}]),
++    "quotes": e([{"note": 'a, b "c"'}]),
++    "header_only": e([{"a": None}]),
++    "no_columns": e([{}]),
++}
++for name, text in cases.items():
++    print(name, "->", repr(text), "| has CR:", "\r" in text)
+diff --git a/app.py b/app.py
+index 72152be..76c34d4 100644
+--- a/app.py
++++ b/app.py
+@@ -2,6 +2,8 @@
+ 
+ from __future__ import annotations
+ 
++import csv
++import io
+ from typing import Any
+ 
+ 
+@@ -9,6 +11,51 @@ class ExportError(ValueError):
+     """Raised when rows cannot be exported."""
+ 
+ 
++def _render(value: Any) -> str:
++    """Render one cell value following the recorded product decisions.
++
++    ``None`` becomes an empty field, booleans become lowercase ``true`` /
++    ``false``, and anything else falls back to ``str()``.
++    """
++    if value is None:
++        return ""
++    if isinstance(value, bool):
++        return "true" if value else "false"
++    return str(value)
++
++
+ def export_csv(rows: list[dict[str, Any]]) -> str:
+-    """Render rows as CSV text."""
+-    raise NotImplementedError("export_csv is not implemented yet")
++    """Render rows as CSV text.
++
++    The header comes from the first row's keys, in that order.  Lines end with
++    ``\\n`` only (the downstream consumer splits on ``\\n``, so no ``\\r`` is
++    ever emitted as a terminator) and quoting is left to the ``csv`` module.
++
++    Product decisions applied to the cells:
++
++    * ``None`` and keys missing from a row become an empty field.
++    * Booleans serialize as lowercase ``true`` / ``false``.
++    * Keys present in a later row but not in the header are ignored.
++    * A row whose fields are all empty after conversion is skipped, so the
++      output never contains a blank line.
++    * An empty input list returns the empty string.
++    """
++    if not rows:
++        return ""
++
++    header = list(rows[0])
++    if not header:
++        # Nothing to export: writing an empty header would only add a blank line.
++        return ""
++
++    buffer = io.StringIO()
++    writer = csv.writer(buffer, lineterminator="\n")
++    writer.writerow(header)
++
++    for row in rows:
++        fields = [_render(row.get(key)) for key in header]
++        if not any(fields):
++            continue
++        writer.writerow(fields)
++
++    return buffer.getvalue()

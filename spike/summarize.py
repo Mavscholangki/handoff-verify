@@ -6,7 +6,8 @@ import json
 from pathlib import Path
 
 RUNS = Path(__file__).resolve().parent.parent / "runs"
-TAKEOVER = RUNS / "takeover"
+BASE = RUNS / "pagination-csv"
+TAKEOVER = BASE / "takeover"
 
 
 def read_json(path: Path) -> dict:
@@ -42,7 +43,7 @@ def duration(run_dir: Path) -> float:
 
 rows = []
 for condition in ("c0", "c1", "c2"):
-    run_dir = RUNS / condition
+    run_dir = BASE / condition
     manifest = read_json(run_dir / "manifest.json")
     grade = read_json(run_dir / "grade.json")
     tokens = int(manifest.get("tokens") or 0)
@@ -72,7 +73,7 @@ for condition in ("c0", "c1", "c2"):
     })
 
 summary = {"rows": rows}
-(RUNS / "value_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+(BASE / "value_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
 for row in rows:
     (Path(row["run_dir"]) / "result.json").write_text(json.dumps(row, ensure_ascii=False, indent=2), encoding="utf-8")
     print(row)

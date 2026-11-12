@@ -48,3 +48,8 @@ security review, full Harness implementation, GUI.
 
 See `report.md` and the `runs/` directory.  `checks.py` and `grade.py` are
 reusable against a later Harness implementation.
+
+A second task (`tasks/csv-policy/`) was added after the first run because the
+first task did not separate C0 from C2: its remaining work was inferable from
+the repository.  The second task puts the needed product decisions only in the
+recorded development brief/conversation; see `report-csv-policy.md`.

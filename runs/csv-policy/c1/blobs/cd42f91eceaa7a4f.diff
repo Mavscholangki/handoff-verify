@@ -1,0 +1,63 @@
+diff --git a/app.py b/app.py
+index 72152be..9c1f97c 100644
+--- a/app.py
++++ b/app.py
+@@ -2,6 +2,8 @@
+ 
+ from __future__ import annotations
+ 
++import csv
++import io
+ from typing import Any
+ 
+ 
+@@ -9,6 +11,47 @@ class ExportError(ValueError):
+     """Raised when rows cannot be exported."""
+ 
+ 
++def _cell(value: Any) -> str:
++    """Render one value according to the export policy.
++
++    ``None`` becomes an empty field, booleans become lowercase ``true`` /
++    ``false`` (never Python's ``True`` / ``False``), and every other value
++    uses ``str()``.
++    """
++    if value is None:
++        return ""
++    if isinstance(value, bool):
++        return "true" if value else "false"
++    return str(value)
++
++
+ def export_csv(rows: list[dict[str, Any]]) -> str:
+-    """Render rows as CSV text."""
+-    raise NotImplementedError("export_csv is not implemented yet")
++    """Render rows as CSV text.
++
++    The header is the first row's keys, in that order; keys that appear only
++    in later rows are ignored.  Cells are rendered by :func:`_cell`, so
++    ``None`` and missing keys become empty fields and booleans are lowercase
++    ``true`` / ``false``.  A row whose cells are all empty after conversion
++    is skipped, so no blank line reaches the consumer.  Records are separated
++    by LF only -- the downstream splitter splits on ``\\n`` and must never see
++    CRLF -- and quoting is left to the ``csv`` module.  An empty input list
++    returns the empty string.
++    """
++    if not rows:
++        return ""
++
++    header = list(rows[0])
++    if not header:
++        # No columns to export: writing a header here would emit a blank line.
++        return ""
++
++    buffer = io.StringIO()
++    writer = csv.writer(buffer, lineterminator="\n")
++    writer.writerow(header)
++
++    for row in rows:
++        fields = [_cell(row.get(key)) for key in header]
++        if any(fields):
++            writer.writerow(fields)
++
++    return buffer.getvalue()

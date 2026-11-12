@@ -1,0 +1,13 @@
+{
+  "passed": false,
+  "returncode": 1,
+  "stdout": "",
+  "stderr": "test_all_empty_rows_are_skipped (test_hidden.CsvPolicyAcceptance.test_all_empty_rows_are_skipped) ... FAIL\ntest_booleans_are_lowercase (test_hidden.CsvPolicyAcceptance.test_booleans_are_lowercase) ... ok\ntest_empty_input (test_hidden.CsvPolicyAcceptance.test_empty_input) ... ok\ntest_header_only_when_all_rows_empty (test_hidden.CsvPolicyAcceptance.test_header_only_when_all_rows_empty) ... FAIL\ntest_lf_only (test_hidden.CsvPolicyAcceptance.test_lf_only) ... ok\ntest_missing_and_extra_keys (test_hidden.CsvPolicyAcceptance.test_missing_and_extra_keys) ... ok\ntest_none_is_empty (test_hidden.CsvPolicyAcceptance.test_none_is_empty) ... ok\ntest_quoting_and_order (test_hidden.CsvPolicyAcceptance.test_quoting_and_order) ... ok\n\n======================================================================\nFAIL: test_all_empty_rows_are_skipped (test_hidden.CsvPolicyAcceptance.test_all_empty_rows_are_skipped)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"D:\\Projects\\handoff-verify\\spike\\tasks\\csv-policy\\hidden\\test_hidden.py\", line 48, in test_all_empty_rows_are_skipped\n    self.assertEqual(rows, [[\"a\", \"b\"], [\"x\", \"y\"]])\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Lists differ: [['a', 'b'], ['', ''], ['x', 'y'], ['', '']] != [['a', 'b'], ['x', 'y']]\n\nFirst differing element 1:\n['', '']\n['x', 'y']\n\nFirst list contains 2 additional elements.\nFirst extra element 2:\n['x', 'y']\n\n- [['a', 'b'], ['', ''], ['x', 'y'], ['', '']]\n+ [['a', 'b'], ['x', 'y']]\n\n======================================================================\nFAIL: test_header_only_when_all_rows_empty (test_hidden.CsvPolicyAcceptance.test_header_only_when_all_rows_empty)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"D:\\Projects\\handoff-verify\\spike\\tasks\\csv-policy\\hidden\\test_hidden.py\", line 53, in test_header_only_when_all_rows_empty\n    self.assertEqual(text, \"a\\n\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^\nAssertionError: 'a\\n\"\"\\n\"\"\\n' != 'a\\n'\n  a\n- \"\"\n- \"\"\n\n\n----------------------------------------------------------------------\nRan 8 tests in 0.001s\n\nFAILED (failures=2)\n",
+  "stdlib": {
+    "ok": true,
+    "bad_imports": [],
+    "has_functions": [
+      "export_csv"
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "run_id": "csv-c2",
+  "mode": "takeover",
+  "condition": "c2",
+  "workspace": "D:\\Projects\\handoff-verify\\runs\\takeover-csv\\c2",
+  "repo": "D:\\Projects\\handoff-verify\\runs\\takeover-csv\\c2\\repo",
+  "model": {
+    "profile": "profile1",
+    "model": "Qwen/Qwen3.8-Flash-Next",
+    "base_url": "https://api-inference.modelscope.cn/v1"
+  },
+  "status": "done",
+  "started_at": "2026-11-12T13:34:05.093456+00:00",
+  "max_steps": 12,
+  "max_seconds": 300.0,
+  "finished_at": "2026-11-12T13:35:39.863601+00:00",
+  "duration_s": 94.776,
+  "tokens": 135635,
+  "steps": 12,
+  "final_text": "Done. Summary of the takeover work:\n\n**What changed (`repo/app.py` only):**\n- Added a module-private helper `_render(value)` implementing the cell-level policy: `None` → `\"\"`, `bool` → lowercase `\"true\"`/`\"false\"` (checked before the `str()` fallback, since `bool` is an `int` subclass), everything else → `str(value)`.\n- Finished `export_csv(rows)` (public name and signature untouched, stdlib only):\n  - empty input list → returns `\"\"` (this was the failing `IndexError`);\n  - header still taken from the first row's keys, in order;\n  - rows are read with `row.get(key)` over the header only, so `None`/missing keys become empty fields and extra keys in later rows are ignored;\n  - a row whose converted fields are all empty is skipped, so no blank line is emitted;\n  - `csv.writer(..., lineterminator=\"\\n\")` keeps output LF-only, with quoting left to the `csv` module;\n  - extra guard: a header-less first row (`[{}]`, i.e. zero columns) returns `\"\"` rather than a lone newline, consistent with the \"never produce a blank line\" decision.\n- Docstring rewritten to state the implemented policy instead of the old \"happy path only / deliberately not implemented\" note. The unused `ExportError` class was left in place to preserve the module's public surface.\n\n**Verification (actually run):**\n- `python -m unittest discover -s tests -q` → exit 0, `Ran 3 tests ... OK` (previously exit 1 with `test_empty_list` erroring).\n- A scratch script (created, run, then deleted; repo tree is clean) exercised each recorded decision and printed results: `e([]) == ''`; booleans → `'flag,off,n\\ntrue,false,1\\n'`; `None`/missing → `'a,b\\n,1\\n,2\\n'`; extra key ignored → `'a\\n1\\n2\\n'`; all-empty row skipped → `'a,b\\n1,2\\n3,4\\n'`; quoting round-trips → `'note\\n\"a, b \"\"c\"\"\"\\n'`; no `\\r` present in any output.\n\n**Remaining caveat (unknown, not decided in the handoff):** the LF guarantee holds for line terminators, but a *value* containing `\\r`/`\\n` is embedded verbatim inside a quoted field by the `csv` module. The recorded brief only constrains the terminator and the downstream splitter is not in this repository, so I did not sanitize cell data — that would alter values and could break a round-trip expectation. If the splitter cannot tolerate quoted newlines, that is the one policy question to settle next."
+}

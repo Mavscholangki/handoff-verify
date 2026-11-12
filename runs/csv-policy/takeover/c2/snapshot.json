@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-11-12T13:31:15.259468+00:00",
+  "code_state": {
+    "tree": "0b7c73c5f292d2ead31dc7f535eefdc7f8d5c91f",
+    "head": "32c2225acfaeb42890b71c84f9bf51d361c1f922",
+    "dirty": true,
+    "changed": [
+      {
+        "status": " M",
+        "path": "app.py"
+      }
+    ],
+    "diff_stat": "app.py | 23 +++++++++++++++++++++--\n 1 file changed, 21 insertions(+), 2 deletions(-)"
+  },
+  "source_events": 33,
+  "extraction_meta": {
+    "mode": "rule-based-explicit-decisions",
+    "llm_calls": 0
+  }
+}

@@ -1,0 +1,94 @@
+diff --git a/app.py b/app.py
+index 72152be..908dd3a 100644
+--- a/app.py
++++ b/app.py
+@@ -2,6 +2,9 @@
+ 
+ from __future__ import annotations
+ 
++import csv
++import io
++from collections.abc import Mapping
+ from typing import Any
+ 
+ 
+@@ -9,6 +12,77 @@ class ExportError(ValueError):
+     """Raised when rows cannot be exported."""
+ 
+ 
++# Product decisions for the downstream consumer.
++#
++# NOTE: the session note that recorded these decisions was not present in
++# this repository when the work was taken over (see README/TASK.md).  The
++# values below are the defaults chosen here, not recovered facts; each one
++# is a single line to change if the note turns up with a different answer.
++TRUE_FIELD = "true"
++FALSE_FIELD = "false"
++NULL_FIELD = ""  # ``None`` and missing keys both render as an empty field
++
++
++def _field(value: Any) -> str:
++    """Render one cell value as CSV text."""
++    if value is None:
++        return NULL_FIELD
++    if isinstance(value, bool):
++        return TRUE_FIELD if value else FALSE_FIELD
++    return str(value)
++
++
+ def export_csv(rows: list[dict[str, Any]]) -> str:
+-    """Render rows as CSV text."""
+-    raise NotImplementedError("export_csv is not implemented yet")
++    """Render rows as CSV text.
++
++    The header comes from the first row's keys in order; every value is
++    rendered with ``str()`` except where a product decision below says
++    otherwise.  Lines end with ``\\n`` and quoting is left to the ``csv``
++    module (``QUOTE_MINIMAL``).
++
++    Decisions implemented for the remaining edge cases:
++
++    1. Empty input.  ``export_csv([])`` returns ``""``.  The same is true
++       when no row carries any keys (e.g. ``[{}, {}]``): with no columns
++       there is no header and nothing a consumer can parse, so no text is
++       emitted rather than a file of blank lines.
++    2. Booleans.  ``True`` / ``False`` become the lowercase tokens
++       ``TRUE_FIELD`` / ``FALSE_FIELD`` (``true`` / ``false``) instead of
++       Python's spellings, because the file is an interchange format read by
++       non-Python consumers.  ``bool`` is checked before the generic ``str()``
++       path so that ``1`` / ``0`` stay ``1`` / ``0``.
++    3. ``None`` and missing keys.  Both render as ``NULL_FIELD``, an empty
++       field.  ``None`` and ``""`` are therefore indistinguishable in the
++       output; that is the usual CSV convention for a null.
++    4. Extra keys.  Keys that appear only in later rows are ignored: the
++       header is fixed by the first row, so those values have no column to
++       go in.  If the *first* row has no keys while a later row does, an
++       ``ExportError`` is raised instead of silently dropping that data.
++    5. All-empty rows.  Rows are never filtered out.  Every input row
++       produces exactly one output line, even when all of its values are
++       empty, so the consumer can rely on ``1 + len(rows)`` records.
++
++    Rows that are not mappings are rejected with ``ExportError``.
++    """
++    for index, row in enumerate(rows):
++        if not isinstance(row, Mapping):
++            raise ExportError(
++                f"row {index} is a {type(row).__name__}, expected a mapping"
++            )
++
++    if not any(rows):  # empty list, or no row carries any keys
++        return ""
++
++    header = list(rows[0])
++    if not header:
++        raise ExportError(
++            "cannot derive a CSV header: the first row has no keys but a later row does"
++        )
++
++    buffer = io.StringIO()
++    writer = csv.writer(buffer, lineterminator="\n")
++    writer.writerow(header)
++    for row in rows:
++        writer.writerow([_field(row.get(key)) for key in header])
++
++    return buffer.getvalue()

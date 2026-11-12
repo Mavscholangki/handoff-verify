@@ -4,7 +4,8 @@
 范围：一个真实小任务 + 三个合成检查 fixture + C0/C1/C2 接手对比  
 模型：NewHarness `profile1`（Qwen/Qwen3.8-Flash-Next），temperature 0  
 定位：课程项目的技术可行性输入，不是产品验收，也不是最终 Harness 的性能结论  
-本轮实际模型消耗约 88 万 token（不含一次超时调用），没有做重复运行。
+本轮实际模型消耗约 88 万 token（不含一次超时调用），没有做重复运行。  
+后续补充任务见 [report-csv-policy.md](report-csv-policy.md)：它让 C0 失败、C1/C2 通过。
 
 ## 结论摘要
 
@@ -121,7 +122,7 @@ dev-01 共 97 个事件，包括 31 个 `tool_started`、30 个 `tool_finished`�
 - `spike/driver.py`：NewHarness 驱动、git 快照、run_tests/sleep、事件日志、kill/resume。
 - `spike/context.py`：事件归一化、账本、抽取、handoff、引用/失效检查。
 - `spike/checks.py`：4 组确定性检查（全部通过）。
-- `spike/task/`：任务 repo、可见测试、隐藏测试。
-- `runs/dev-01/`：97 个事件、handoff、citations、claim_review、recovery。
-- `runs/c0/`、`runs/c1/`、`runs/c2/`：三条件接手记录、grade、result。
-- `runs/value_summary.json`：对比表。
+- `spike/tasks/pagination-csv/`：任务 repo、可见测试、隐藏测试。
+- `runs/pagination-csv/dev-01/`：97 个事件、handoff、citations、claim_review、recovery。
+- `runs/pagination-csv/c0/`、`c1/`、`c2/`：三条件接手记录、grade、result。
+- `runs/pagination-csv/value_summary.json`：对比表。

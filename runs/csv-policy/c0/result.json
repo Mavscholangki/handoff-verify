@@ -1,0 +1,13 @@
+{
+  "condition": "c0",
+  "run_id": "c0",
+  "status": "max_steps (hidden tests failed)",
+  "tokens": 83140,
+  "steps": 12,
+  "duration_s": 141.4,
+  "hidden_tests_passed": false,
+  "stdlib_ok": true,
+  "final_answer": false,
+  "material": "task brief + repo only",
+  "material_chars": 0
+}

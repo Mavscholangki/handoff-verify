@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "returncode": 0,
+  "stdout": "",
+  "stderr": "test_all_empty_rows_are_skipped (test_hidden.CsvPolicyAcceptance.test_all_empty_rows_are_skipped) ... ok\ntest_booleans_are_lowercase (test_hidden.CsvPolicyAcceptance.test_booleans_are_lowercase) ... ok\ntest_empty_input (test_hidden.CsvPolicyAcceptance.test_empty_input) ... ok\ntest_header_only_when_all_rows_empty (test_hidden.CsvPolicyAcceptance.test_header_only_when_all_rows_empty) ... ok\ntest_lf_only (test_hidden.CsvPolicyAcceptance.test_lf_only) ... ok\ntest_missing_and_extra_keys (test_hidden.CsvPolicyAcceptance.test_missing_and_extra_keys) ... ok\ntest_none_is_empty (test_hidden.CsvPolicyAcceptance.test_none_is_empty) ... ok\ntest_quoting_and_order (test_hidden.CsvPolicyAcceptance.test_quoting_and_order) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 0.000s\n\nOK\n",
+  "stdlib": {
+    "ok": true,
+    "bad_imports": [],
+    "has_functions": [
+      "export_csv"
+    ]
+  }
+}

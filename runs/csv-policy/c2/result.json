@@ -1,0 +1,13 @@
+{
+  "condition": "c2",
+  "run_id": "c2",
+  "status": "done",
+  "tokens": 135635,
+  "steps": 12,
+  "duration_s": 95.4,
+  "hidden_tests_passed": true,
+  "stdlib_ok": true,
+  "final_answer": true,
+  "material": "D:\\Projects\\handoff-verify\\runs\\csv-policy\\takeover\\c2\\handoff.md",
+  "material_chars": 5047
+}

@@ -1,0 +1,38 @@
+diff --git a/app.py b/app.py
+index 72152be..095ae8f 100644
+--- a/app.py
++++ b/app.py
+@@ -2,6 +2,8 @@
+ 
+ from __future__ import annotations
+ 
++import csv
++import io
+ from typing import Any
+ 
+ 
+@@ -10,5 +12,22 @@ class ExportError(ValueError):
+ 
+ 
+ def export_csv(rows: list[dict[str, Any]]) -> str:
+-    """Render rows as CSV text."""
+-    raise NotImplementedError("export_csv is not implemented yet")
++    """Render rows as CSV text.
++
++    Happy path only: the header comes from the first row's keys in order and
++    every value is rendered with ``str()``.  Lines end with ``\\n`` and quoting
++    is left to the ``csv`` module.
++
++    The remaining product decisions (booleans, ``None``/missing keys, extra
++    keys, all-empty rows, and the empty-list result) are deliberately not
++    implemented in this phase.
++    """
++    buffer = io.StringIO()
++    writer = csv.writer(buffer, lineterminator="\n")
++
++    header = list(rows[0])
++    writer.writerow(header)
++    for row in rows:
++        writer.writerow([str(row[key]) for key in header])
++
++    return buffer.getvalue()
