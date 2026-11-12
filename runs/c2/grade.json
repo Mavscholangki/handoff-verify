@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "returncode": 0,
+  "stdout": "",
+  "stderr": "test_empty (test_hidden.CsvAcceptance.test_empty) ... ok\ntest_header_and_rows (test_hidden.CsvAcceptance.test_header_and_rows) ... ok\ntest_quotes (test_hidden.CsvAcceptance.test_quotes) ... ok\ntest_defaults (test_hidden.PaginationAcceptance.test_defaults) ... ok\ntest_limit_bounds (test_hidden.PaginationAcceptance.test_limit_bounds) ... ok\ntest_limit_is_capped (test_hidden.PaginationAcceptance.test_limit_is_capped) ... ok\ntest_offset_bounds (test_hidden.PaginationAcceptance.test_offset_bounds) ... ok\ntest_string_values (test_hidden.PaginationAcceptance.test_string_values) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 0.000s\n\nOK\n",
+  "stdlib": {
+    "ok": true,
+    "bad_imports": [],
+    "has_functions": [
+      "export_csv",
+      "parse_pagination"
+    ]
+  }
+}

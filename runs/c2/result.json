@@ -1,0 +1,12 @@
+{
+  "condition": "c2",
+  "run_dir": "D:\\Projects\\handoff-verify\\runs\\c2",
+  "status": "max_steps (task solved)",
+  "steps": 12,
+  "tokens": 206493,
+  "duration_s": 111.9,
+  "hidden_tests_passed": true,
+  "stdlib_ok": true,
+  "material": "D:\\Projects\\handoff-verify\\runs\\takeover\\c2\\handoff.md",
+  "material_chars": 9678
+}

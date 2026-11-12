@@ -1,0 +1,6 @@
+[
+  {
+    "name": "resume",
+    "text": "You were interrupted during the previous turn. Inspect the current repository state, check whether the refactor and tests are complete, and finish only that work. Do not start export_csv; a handoff will follow."
+  }
+]

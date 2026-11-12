@@ -1,0 +1,12 @@
+{
+  "condition": "c1",
+  "run_dir": "D:\\Projects\\handoff-verify\\runs\\c1",
+  "status": "done",
+  "steps": 11,
+  "tokens": 334232,
+  "duration_s": 105.6,
+  "hidden_tests_passed": true,
+  "stdlib_ok": true,
+  "material": "D:\\Projects\\handoff-verify\\runs\\takeover\\c1\\raw\\transcript.md",
+  "material_chars": 32241
+}

@@ -1,0 +1,12 @@
+{
+  "condition": "c0",
+  "run_dir": "D:\\Projects\\handoff-verify\\runs\\c0",
+  "status": "done",
+  "steps": 11,
+  "tokens": 98356,
+  "duration_s": 97.7,
+  "hidden_tests_passed": true,
+  "stdlib_ok": true,
+  "material": "task brief + repo only",
+  "material_chars": 0
+}

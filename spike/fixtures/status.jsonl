@@ -1,0 +1,6 @@
+{"event_id":"evt-status-01","seq":0,"type":"tool_started","tool":"run_tests","arguments":{"command":"python -m unittest"}}
+{"event_id":"evt-status-02","seq":1,"type":"tool_finished","tool":"run_tests","status":"failed","result":{"ok":true,"result":{"exit_code":1,"stdout":"FAILED","stderr":""}},"after":{"tree":"t1","changed":[]}}
+{"event_id":"evt-status-03","seq":2,"type":"tool_finished","tool":"write_file","status":"succeeded","result":{"ok":true,"result":"wrote app.py"},"after":{"tree":"t2","changed":[{"status":"M","path":"app.py"}]}}
+{"event_id":"evt-status-04","seq":3,"type":"synthetic_tool_result","status":"not_executed","content":"{\"ok\": false, \"skipped\": true, \"error\": \"turn ended before this call was executed\"}"}
+{"event_id":"evt-status-05","seq":4,"type":"turn_failed","error":"CancelledError: stop"}
+{"event_id":"evt-status-06","seq":5,"type":"tool_finished","tool":"run_tests","status":"succeeded","result":{"ok":true,"result":{"exit_code":0,"stdout":"OK","stderr":""}},"after":{"tree":"t3","changed":[]}}

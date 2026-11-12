@@ -1,0 +1,2 @@
+{"event_id":"evt-cite-01","seq":0,"type":"user_message","content":"Use the standard library only."}
+{"event_id":"evt-cite-02","seq":1,"type":"tool_finished","tool":"run_tests","status":"succeeded","result":{"ok":true,"result":{"exit_code":0,"stdout":"OK"}},"after":{"tree":"tree-old","changed":[]}}

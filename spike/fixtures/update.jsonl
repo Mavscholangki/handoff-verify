@@ -1,0 +1,4 @@
+{"item_id":"d1","kind":"decision","text":"Validation errors use 422","status":"active","rationale":"initial API convention","evidence":["e1"]}
+{"item_id":"d2","kind":"decision","text":"Validation errors use 400","status":"active","rationale":"product changed the convention","evidence":["e2"]}
+{"item_id":"d3","kind":"decision","text":"Use CSV delimiter comma","status":"active","rationale":"default format","evidence":["e3"]}
+{"item_id":"d4","kind":"constraint","text":"Only the standard library","status":"active","evidence":["e4"]}

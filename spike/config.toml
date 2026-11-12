@@ -1,0 +1,8 @@
+# Local configuration for the spike.  Change model_profile when a different
+# profile is needed; the code does not hard-code a profile name.
+model_profile = "profile1"
+newharness_home = "D:/Projects/NewHarness"
+max_steps = 16
+max_seconds = 600
+temperature = 0.0
+timeout_s = 180

@@ -1,0 +1,126 @@
+diff --git a/app.py b/app.py
+index 8ed4ad9..bf7ea0a 100644
+--- a/app.py
++++ b/app.py
+@@ -12,17 +12,73 @@ from typing import Any
+ class ValidationError(ValueError):
+     """Raised when a query parameter cannot be accepted."""
+ 
+-    code = 422
++    code = 400
+ 
+     def __init__(self, message: str) -> None:
+         super().__init__(message)
+ 
+ 
++DEFAULT_LIMIT = 20
++MAX_LIMIT = 100
++DEFAULT_OFFSET = 0
++
++
++def _not_an_integer(name: str, value: Any) -> ValidationError:
++    """Build the error used for every value that is not an integer."""
++    return ValidationError(f"{name} must be an integer, got {value!r}")
++
++
++def _to_int(name: str, value: Any) -> int:
++    """Convert one raw query value to ``int``, ignoring the range.
++
++    Accepts plain ``int``s and strings that ``int()`` understands (with
++    surrounding whitespace); ``bool``s, floats and everything else are
++    rejected.
++    """
++    if isinstance(value, bool):
++        raise _not_an_integer(name, value)
++    if isinstance(value, int):
++        return value
++    if isinstance(value, str):
++        try:
++            return int(value.strip())
++        except ValueError:
++            raise _not_an_integer(name, value) from None
++    raise _not_an_integer(name, value)
++
++
++def _to_non_negative_int(name: str, value: Any) -> int:
++    """Convert one raw query value and reject negative numbers."""
++    number = _to_int(name, value)
++    if number < 0:
++        raise ValidationError(f"{name} must not be negative, got {number}")
++    return number
++
++
++def _read_int(params: dict[str, Any], name: str, default: int) -> int:
++    """Read one integer parameter; absent or ``None`` means the default."""
++    raw = params.get(name)
++    if raw is None:
++        return default
++    return _to_non_negative_int(name, raw)
++
++
+ def parse_pagination(params: dict[str, Any]) -> dict[str, int]:
+-    """Parse ``limit`` / ``offset`` query parameters."""
+-    raise NotImplementedError("parse_pagination is not implemented yet")
++    """Parse ``limit`` / ``offset`` query parameters.
++
++    * ``limit`` defaults to :data:`DEFAULT_LIMIT` and is capped at
++      :data:`MAX_LIMIT`.
++    * ``offset`` defaults to :data:`DEFAULT_OFFSET`.
++    * Negative or non-integer values raise :class:`ValidationError`.
++    """
++    limit = _read_int(params, "limit", DEFAULT_LIMIT)
++    offset = _read_int(params, "offset", DEFAULT_OFFSET)
++    return {"limit": min(limit, MAX_LIMIT), "offset": offset}
+ 
+ 
+ def export_csv(rows: list[dict[str, Any]]) -> str:
+     """Render rows as CSV with a header row."""
+     raise NotImplementedError("export_csv is not implemented yet")
++
++# NOTE: this line was added by a reviewer after the last test run.
++
+diff --git a/tests/test_pagination.py b/tests/test_pagination.py
+index 3d75241..ca6a26b 100644
+--- a/tests/test_pagination.py
++++ b/tests/test_pagination.py
+@@ -14,6 +14,40 @@ class PaginationTests(unittest.TestCase):
+         with self.assertRaises(ValidationError):
+             parse_pagination({"offset": "-1"})
+ 
++    def test_limit_above_maximum_is_capped(self) -> None:
++        self.assertEqual(parse_pagination({"limit": "500"}), {"limit": 100, "offset": 0})
++
++    def test_integer_values_are_accepted(self) -> None:
++        self.assertEqual(parse_pagination({"limit": 5, "offset": 10}), {"limit": 5, "offset": 10})
++
++    def test_whitespace_is_stripped(self) -> None:
++        self.assertEqual(parse_pagination({"limit": " 30 ", "offset": " 2 "}), {"limit": 30, "offset": 2})
++
++    def test_missing_or_none_values_fall_back_to_defaults(self) -> None:
++        self.assertEqual(parse_pagination({"limit": None, "offset": None}), {"limit": 20, "offset": 0})
++
++    def test_non_integer_limit_is_rejected(self) -> None:
++        with self.assertRaises(ValidationError):
++            parse_pagination({"limit": "abc"})
++        with self.assertRaises(ValidationError):
++            parse_pagination({"limit": "1.5"})
++
++    def test_negative_limit_is_rejected(self) -> None:
++        with self.assertRaises(ValidationError):
++            parse_pagination({"limit": "-5"})
++
++    def test_non_integer_types_are_rejected(self) -> None:
++        for value in (True, 1.5, [1], {"a": 1}):
++            with self.subTest(value=value):
++                with self.assertRaises(ValidationError):
++                    parse_pagination({"offset": value})
++
++    def test_validation_error_uses_http_400(self) -> None:
++        self.assertEqual(ValidationError.code, 400)
++        with self.assertRaises(ValidationError) as ctx:
++            parse_pagination({"offset": "-1"})
++        self.assertEqual(ctx.exception.code, 400)
++
+ 
+ if __name__ == "__main__":
+     unittest.main()

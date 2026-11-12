@@ -1,0 +1,82 @@
+diff --git a/app.py b/app.py
+index 8ed4ad9..0bd84e6 100644
+--- a/app.py
++++ b/app.py
+@@ -12,15 +12,57 @@ from typing import Any
+ class ValidationError(ValueError):
+     """Raised when a query parameter cannot be accepted."""
+ 
+-    code = 422
++    code = 400
+ 
+     def __init__(self, message: str) -> None:
+         super().__init__(message)
+ 
+ 
++DEFAULT_LIMIT = 20
++MAX_LIMIT = 100
++DEFAULT_OFFSET = 0
++
++
++def _as_int(name: str, value: Any) -> int:
++    """Coerce a query parameter to a non-negative ``int``.
++
++    ``None`` is treated as "not supplied" by the caller, so anything
++    reaching here must be an integer value: plain ``int``s or strings that
++    ``int()`` accepts.  Anything else raises :class:`ValidationError`.
++    """
++    if isinstance(value, bool):
++        raise ValidationError(f"{name} must be an integer, got {value!r}")
++    if isinstance(value, int):
++        number = value
++    elif isinstance(value, str):
++        text = value.strip()
++        try:
++            number = int(text)
++        except ValueError:
++            raise ValidationError(f"{name} must be an integer, got {value!r}") from None
++    else:
++        raise ValidationError(f"{name} must be an integer, got {value!r}")
++
++    if number < 0:
++        raise ValidationError(f"{name} must not be negative, got {number}")
++    return number
++
++
+ def parse_pagination(params: dict[str, Any]) -> dict[str, int]:
+-    """Parse ``limit`` / ``offset`` query parameters."""
+-    raise NotImplementedError("parse_pagination is not implemented yet")
++    """Parse ``limit`` / ``offset`` query parameters.
++
++    * ``limit`` defaults to :data:`DEFAULT_LIMIT` and is capped at
++      :data:`MAX_LIMIT`.
++    * ``offset`` defaults to :data:`DEFAULT_OFFSET`.
++    * Negative or non-integer values raise :class:`ValidationError`.
++    """
++    limit_value = params.get("limit", DEFAULT_LIMIT)
++    offset_value = params.get("offset", DEFAULT_OFFSET)
++
++    limit = DEFAULT_LIMIT if limit_value is None else _as_int("limit", limit_value)
++    offset = DEFAULT_OFFSET if offset_value is None else _as_int("offset", offset_value)
++
++    return {"limit": min(limit, MAX_LIMIT), "offset": offset}
+ 
+ 
+ def export_csv(rows: list[dict[str, Any]]) -> str:
+diff --git a/tests/test_pagination.py b/tests/test_pagination.py
+index 3d75241..1a93d93 100644
+--- a/tests/test_pagination.py
++++ b/tests/test_pagination.py
+@@ -14,6 +14,12 @@ class PaginationTests(unittest.TestCase):
+         with self.assertRaises(ValidationError):
+             parse_pagination({"offset": "-1"})
+ 
++    def test_validation_error_uses_http_400(self) -> None:
++        self.assertEqual(ValidationError.code, 400)
++        with self.assertRaises(ValidationError) as ctx:
++            parse_pagination({"offset": "-1"})
++        self.assertEqual(ctx.exception.code, 400)
++
+ 
+ if __name__ == "__main__":
+     unittest.main()
